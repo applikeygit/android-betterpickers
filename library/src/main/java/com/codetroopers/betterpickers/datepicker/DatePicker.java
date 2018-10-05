@@ -802,7 +802,7 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
             mYearInputPointer = 0;
         }
 
-        if(dayOfMonth == 0){
+        if(dayOfMonth == 0 || dayOfMonth == -1){
             mDateInput[0] = -1;
             mDateInput[1] = -1;
         } else {
