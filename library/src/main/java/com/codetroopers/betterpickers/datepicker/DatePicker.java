@@ -23,6 +23,7 @@ import com.codetroopers.betterpickers.R;
 import com.codetroopers.betterpickers.widget.UnderlinePageIndicatorPicker;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -31,10 +32,10 @@ import java.util.Locale;
 public class DatePicker extends LinearLayout implements Button.OnClickListener,
         Button.OnLongClickListener {
 
-    protected int mDateInputSize = 2;
+    protected final int mDateInputSize = 2;
     protected int mYearInputSize = 4;
     protected int mMonthInput = -1;
-    protected int mDateInput[] = new int[mDateInputSize];
+    protected int mDateInput[] = new int[]{-1, -1};
     protected int mYearInput[] = new int[mYearInputSize];
     protected int mDateInputPointer = -1;
     protected int mYearInputPointer = -1;
@@ -198,7 +199,7 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
         mDivider = findViewById(R.id.divider);
 
         for (int i = 0; i < mDateInput.length; i++) {
-            mDateInput[i] = 0;
+            mDateInput[i] = -1;
         }
         for (int i = 0; i < mYearInput.length; i++) {
             mYearInput[i] = 0;
@@ -422,7 +423,7 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
                         for (int i = 0; i < mDateInputPointer; i++) {
                             mDateInput[i] = mDateInput[i + 1];
                         }
-                        mDateInput[mDateInputPointer] = 0;
+                        mDateInput[mDateInputPointer] = -1;
                         mDateInputPointer--;
                     } else if (mKeyboardPager.getCurrentItem() > 0) {
                         mKeyboardPager.setCurrentItem(mKeyboardPager.getCurrentItem() - 1, true);
@@ -495,7 +496,7 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
      */
     public void reset() {
         for (int i = 0; i < mDateInputSize; i++) {
-            mDateInput[i] = 0;
+            mDateInput[i] = -1;
         }
         for (int i = 0; i < mYearInputSize; i++) {
             mYearInput[i] = 0;
@@ -514,7 +515,15 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
         } else {
             month = mMonthAbbreviations[mMonthInput];
         }
-        mEnteredDate.setDate(month, getDayOfMonth(), getYear());
+
+        String date = "";
+        if(mDateInput[1] != -1){
+            date = String.valueOf(mDateInput[1]);
+        }
+        if(mDateInput[0] != -1){
+            date += String.valueOf(mDateInput[0]);
+        }
+        mEnteredDate.setDate(month, date, getYear());
     }
 
     protected void setLeftRightEnabled() {
@@ -625,7 +634,12 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
         } else if (date >= 1) {
             setDateKeyRange(9);
         } else {
-            setDateMinKeyRange(1);
+            // If date 0
+            if(mDateInput[0] == -1){
+                setDateMinKeyRange(0);
+            } else {
+                setDateMinKeyRange(1);
+            }
         }
     }
 
@@ -754,7 +768,15 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
      * @return the inputted day of month
      */
     public int getDayOfMonth() {
-        return mDateInput[1] * 10 + mDateInput[0];
+        if(mDateInput[0] == -1){
+            return 0;
+        } else {
+            if(mDateInput[1] == -1){
+                return mDateInput[0];
+            } else {
+                return mDateInput[1] * 10 + mDateInput[0];
+            }
+        }
     }
 
     /**
@@ -779,8 +801,15 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
         } else if (year > 0) {
             mYearInputPointer = 0;
         }
-        mDateInput[1] = dayOfMonth / 10;
-        mDateInput[0] = dayOfMonth % 10;
+
+        if(dayOfMonth == 0){
+            mDateInput[0] = -1;
+            mDateInput[1] = -1;
+        } else {
+            mDateInput[1] = dayOfMonth / 10;
+            mDateInput[0] = dayOfMonth % 10;
+        }
+
         if (dayOfMonth >= 10) {
             mDateInputPointer = 1;
         } else if (dayOfMonth > 0) {
@@ -870,6 +899,7 @@ public class DatePicker extends LinearLayout implements Button.OnClickListener,
         mYearInput = savedState.mYearInput;
         if (mDateInput == null) {
             mDateInput = new int[mDateInputSize];
+            Arrays.fill(mDateInput, -1);
             mDateInputPointer = -1;
         }
         if (mYearInput == null) {

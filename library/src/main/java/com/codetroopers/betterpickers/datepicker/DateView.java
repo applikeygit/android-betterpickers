@@ -125,10 +125,10 @@ public class DateView extends PickerLinearLayout {
      * Set the date shown
      *
      * @param month a String representing the month of year
-     * @param dayOfMonth an int representing the day of month
+     * @param dayOfMonth an String representing the day of month
      * @param year an int representing the year
      */
-    public void setDate(String month, int dayOfMonth, int year) {
+    public void setDate(String month, String dayOfMonth, int year) {
         if (mMonth != null) {
             if (month.equals("")) {
                 mMonth.setText("-");
@@ -143,12 +143,12 @@ public class DateView extends PickerLinearLayout {
             }
         }
         if (mDate != null) {
-            if (dayOfMonth <= 0) {
+            if (dayOfMonth.isEmpty()) {
                 mDate.setText("-");
                 mDate.setEnabled(false);
                 mDate.updatePadding();
             } else {
-                mDate.setText(Integer.toString(dayOfMonth));
+                mDate.setText(dayOfMonth);
                 mDate.setEnabled(true);
                 mDate.updatePadding();
             }
